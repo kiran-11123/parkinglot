@@ -1,9 +1,9 @@
 package com.example.parkinglot.entity;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -44,7 +44,7 @@ public class VechileParking {
     @Column (name = "exit_time")
     private LocalDateTime exitTime;
 
-    @OneToOne (mappedBy = "vechileParking")
+    @OneToOne(mappedBy = "vehicleParking", cascade = CascadeType.ALL, orphanRemoval = true)
     private VechileParkingSpot vechileParkingSpot;
 
 }

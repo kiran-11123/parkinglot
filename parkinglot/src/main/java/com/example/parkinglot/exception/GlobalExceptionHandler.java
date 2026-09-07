@@ -78,4 +78,27 @@ public class GlobalExceptionHandler {
                 .body(response);
     }
 
+    
+      @ExceptionHandler(VechileNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> vechileNotFound(
+            VechileNotFoundException e) {
+
+        log.error(
+                "Vechile not found",
+                e
+        );
+
+        ApiResponse<Void> response =
+                ApiResponse.<Void>builder()
+                        .status(HttpStatus.NOT_FOUND.value())
+                        .message("Vechile not found in the parking lot")
+                        .data(null)
+                        .build();
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(response);
+    }
+
+
 }

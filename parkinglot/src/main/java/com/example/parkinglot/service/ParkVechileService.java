@@ -10,6 +10,8 @@ import com.example.parkinglot.dto.ResponseDto;
 import com.example.parkinglot.dto.parkingSpotResponse;
 import com.example.parkinglot.entity.VechileParking;
 import com.example.parkinglot.entity.VechileParkingSpot;
+import com.example.parkinglot.exception.ParkingSpotNotAvailableException;
+import com.example.parkinglot.exception.VechileNotFoundException;
 import com.example.parkinglot.exception.vechileNumberExists;
 import com.example.parkinglot.repository.ParkingVechileRepository;
 import com.example.parkinglot.utils.ParkingSpotAllocator;
@@ -64,6 +66,8 @@ LocalDateTime endOfDay = today.plusDays(1).atStartOfDay();
                     .vechileParkingSpot(vechileParkingSpot)
                     .build();
 
+                vechileParkingSpot.setVehicleParking(vechileParking);
+
             VechileParking savedVechileParking = parkingVechileRepository.save(vechileParking);
 
             return ResponseDto.builder()
@@ -72,6 +76,7 @@ LocalDateTime endOfDay = today.plusDays(1).atStartOfDay();
                     .parkingLocation(savedVechileParking.getVechileParkingSpot().getLocation())
                     .spotId(savedVechileParking.getVechileParkingSpot().getSpotId())
                     .parkingSpot(savedVechileParking.getVechileParkingSpot().getParkingSpot())
+                    .vechileType(savedVechileParking.getType())
                     .build();
 
          
@@ -83,10 +88,31 @@ LocalDateTime endOfDay = today.plusDays(1).atStartOfDay();
              
 
           }
-          catch(Exception e){
-             log.info("Error occured while parking the vechile {} " , request.getVechileNumber() );
-             throw new RuntimeException("Error occured while parking the vechile");
+           catch (vechileNumberExists | ParkingSpotNotAvailableException e) {
+               throw e;
+           }
+           catch(Exception e){
+                 log.error("Error occurred while parking the vehicle {}", request.getVechileNumber(), e);
+                 throw new RuntimeException("Error occurred while parking the vehicle", e);
           }
+    }
+
+    public  ResponseDto getVechileDetails(String vechileNumber){
+        log.info("Fetching vehicle details for vehicle number: {}", vechileNumber);
+
+        return parkingVechileRepository.findByVechileNumber(vechileNumber)
+                .map(vechileParking -> ResponseDto.builder()
+                        .vechileNumber(vechileParking.getVechileNumber())
+                        .entryTime(vechileParking.getEntryTime())
+                        .parkingLocation(vechileParking.getVechileParkingSpot().getLocation())
+                        .spotId(vechileParking.getVechileParkingSpot().getSpotId())
+                        .parkingSpot(vechileParking.getVechileParkingSpot().getParkingSpot())
+                        .vechileType(vechileParking.getType())
+                        .build())
+                .orElseThrow(() -> {
+                    log.error("Vehicle number {} not found in the parking lot", vechileNumber);
+                    return new VechileNotFoundException("Vehicle number not found in the parking lot");
+                });
     }
 
 

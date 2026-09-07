@@ -18,7 +18,10 @@ public class ParkingSpotAllocator {
             ParkingLocation,
             Map<VechileType, PriorityQueue<Integer>>
             > parkSpot = new HashMap<>();
-
+   
+            public ParkingSpotAllocator() {
+               initializeParkingSpots();
+            }
 
     public parkingSpotResponse parkVehicle(VechileType type) {
 
@@ -45,5 +48,38 @@ public class ParkingSpotAllocator {
         throw new ParkingSpotNotAvailableException(
                 "No parking spot available for vehicle type: " + type
         );
+    }
+
+    public void initializeParkingSpots() {
+        for (ParkingLocation location : ParkingLocation.values()) {
+            Map<VechileType, PriorityQueue<Integer>> spotsByType = new HashMap<>();
+
+            for (VechileType type : VechileType.values()) {
+                PriorityQueue<Integer> availableSpots = new PriorityQueue<>();
+                int totalSpots = (type == VechileType.BIKE) ? 10 : 20;
+
+                for (int i = 1; i <= totalSpots; i++) {
+                    availableSpots.offer(i);
+                }
+
+                spotsByType.put(type, availableSpots);
+            }
+
+            parkSpot.put(location, spotsByType);
+        }
+    }
+
+
+    public void releaseParkingSpot(ParkingLocation location , VechileType type , int spotId){
+            
+        Map<VechileType,PriorityQueue<Integer>> spotByType = parkSpot.get(location);
+
+        if(spotByType != null){
+            PriorityQueue<Integer> availableSpots = spotByType.get(type);
+            if(availableSpots != null){
+                availableSpots.offer(spotId);
+            }
+        }
+        
     }
 }

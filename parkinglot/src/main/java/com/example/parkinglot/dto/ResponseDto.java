@@ -18,4 +18,5 @@ public class ResponseDto {
     private  ParkingLocation parkingLocation;
     private ParkingSpot parkingSpot;
     private LocalDateTime entryTime;
+    private int spotId;
 }

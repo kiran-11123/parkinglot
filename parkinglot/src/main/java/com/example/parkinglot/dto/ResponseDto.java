@@ -1,5 +1,16 @@
 package com.example.parkinglot.dto;
 
-public class ResponseDto {
+import com.example.parkinglot.entity.ParkingLocation;
+import com.example.parkinglot.entity.ParkingSpot;
+import com.example.parkinglot.entity.VechileType;
 
+import lombok.Data;
+
+@Data 
+public class ResponseDto {
+     
+    private String vechileNumber;
+    private VechileType vechileType;
+    private  ParkingLocation parkingLocation;
+    private ParkingSpot parkingSpot;
 }

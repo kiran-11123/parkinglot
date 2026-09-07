@@ -1,5 +1,6 @@
 package com.example.parkinglot.entity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -41,9 +42,13 @@ public class VechileParking {
     @Enumerated (EnumType.STRING)
     @Column (name = "parking_spot", nullable = false)
     private ParkingSpot parkingSpot;
+    
+    @Column (name = "spot_id", nullable = false)
+    private int spotId;
      
     @Column (name = "entry_time", nullable = false)
     private LocalDateTime entryTime;
+    
 
 
     @Column (name = "exit_time")

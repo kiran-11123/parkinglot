@@ -46,13 +46,35 @@ public class GlobalExceptionHandler {
 
         ApiResponse<Void> response =
                 ApiResponse.<Void>builder()
-                        .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                        .status(HttpStatus.CONFLICT.value())
                         .message("Vechile number already exists in the parking lot")
                         .data(null)
                         .build();
 
         return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .status(HttpStatus.CONFLICT)
+                .body(response);
+    }
+
+
+      @ExceptionHandler(ParkingSpotNotAvailableException.class)
+    public ResponseEntity<ApiResponse<Void>> ParkingSpotNotAvailable(
+            ParkingSpotNotAvailableException e) {
+
+        log.error(
+                "Parking spot not available",
+                e
+        );
+
+        ApiResponse<Void> response =
+                ApiResponse.<Void>builder()
+                        .status(HttpStatus.NOT_FOUND.value())
+                        .message("No parking spot available for the requested vehicle type")
+                        .data(null)
+                        .build();
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
                 .body(response);
     }
 

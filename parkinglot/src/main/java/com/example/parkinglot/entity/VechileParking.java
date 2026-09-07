@@ -10,6 +10,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,18 +34,7 @@ public class VechileParking {
 
     @Column (name = "vechile_number", nullable = false, unique = true)
     private String vechileNumber;
-   
-    @Enumerated (EnumType.STRING)
-    @Column (name = "parking_location", nullable = false)
-    private ParkingLocation location;
-
-
-    @Enumerated (EnumType.STRING)
-    @Column (name = "parking_spot", nullable = false)
-    private ParkingSpot parkingSpot;
-    
-    @Column (name = "spot_id", nullable = false)
-    private int spotId;
+ 
      
     @Column (name = "entry_time", nullable = false)
     private LocalDateTime entryTime;
@@ -53,5 +43,8 @@ public class VechileParking {
 
     @Column (name = "exit_time")
     private LocalDateTime exitTime;
+
+    @OneToOne (mappedBy = "vechileParking")
+    private VechileParkingSpot vechileParkingSpot;
 
 }

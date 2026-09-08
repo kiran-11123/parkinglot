@@ -82,10 +82,9 @@ public class ParkVechileController {
         GetParkingSlotsResponse response  = parkVechileService.getParkingSlots(vechileType);
         ApiResponse<GetParkingSlotsResponse> result  = ApiResponse.<GetParkingSlotsResponse>builder().status(200).message("Available slot details fetched successfully").data(response).build();
         return  ResponseEntity.ok(result);
-
-
-
     }
+
+    
 
 
 

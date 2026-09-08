@@ -152,16 +152,15 @@ LocalDateTime endOfDay = today.plusDays(1).atStartOfDay();
     
 
     public GetParkingSlotsResponse getParkingSlots(VechileType vechileType){
-           
         log.info("Entered into getParkingSlotsResponse Service");
-          
         int result = parkingSpotAllocator.getParkingSlots(vechileType);
-
         return GetParkingSlotsResponse.builder()
                 .slotsAvailable(result)
                 .type(vechileType)
                 .build();
     }
+
+    
 
 
 

@@ -16,6 +16,7 @@ import java.util.PriorityQueue;
 @Component
 @Slf4j 
 public class ParkingSpotAllocator {
+    
 
     private final Map<
             ParkingLocation,

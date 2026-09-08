@@ -32,7 +32,7 @@ public class VechileParking {
     @Enumerated (EnumType.STRING)
     private VechileType type;
 
-    @Column (name = "vechile_number", nullable = false, unique = true)
+    @Column (name = "vechile_number", nullable = false)
     private String vechileNumber;
  
      

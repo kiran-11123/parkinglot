@@ -5,6 +5,8 @@ import com.example.parkinglot.entity.ParkingLocation;
 import com.example.parkinglot.entity.VechileType;
 import com.example.parkinglot.exception.ParkingSpotNotAvailableException;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -12,6 +14,7 @@ import java.util.Map;
 import java.util.PriorityQueue;
 
 @Component
+@Slf4j 
 public class ParkingSpotAllocator {
 
     private final Map<
@@ -24,7 +27,7 @@ public class ParkingSpotAllocator {
             }
 
     public parkingSpotResponse parkVehicle(VechileType type) {
-
+        log.info("Attempting to park vehicle of type: {}", type);
         for (ParkingLocation location : parkSpot.keySet()) {
 
             Map<VechileType, PriorityQueue<Integer>> spotsByType =
@@ -37,6 +40,7 @@ public class ParkingSpotAllocator {
 
                 int spotId = availableSpots.poll();
 
+                log.info("Vehicle parked successfully at location: {}, spot ID: {}", location, spotId);
                 return parkingSpotResponse.builder()
                         .location(location)
                         .spotId(spotId)
@@ -51,6 +55,7 @@ public class ParkingSpotAllocator {
     }
 
     public void initializeParkingSpots() {
+        log.info("Initializing parking spots for all locations and vehicle types");
         for (ParkingLocation location : ParkingLocation.values()) {
             Map<VechileType, PriorityQueue<Integer>> spotsByType = new HashMap<>();
 
@@ -70,16 +75,34 @@ public class ParkingSpotAllocator {
     }
 
 
-    public void releaseParkingSpot(ParkingLocation location , VechileType type , int spotId){
-            
+    public boolean releaseParkingSpot(ParkingLocation location , VechileType type , int spotId){
+        log.info("Releasing parking spot at location: {}, type: {}, spot ID: {}", location, type, spotId);
         Map<VechileType,PriorityQueue<Integer>> spotByType = parkSpot.get(location);
 
         if(spotByType != null){
             PriorityQueue<Integer> availableSpots = spotByType.get(type);
             if(availableSpots != null){
                 availableSpots.offer(spotId);
+                log.info("Parking spot released at location: {}, spot ID: {}", location, spotId);
+                return true;
             }
         }
-        
+        return false;
+
+    }
+
+    public int getParkingSlots(VechileType vechileType){
+        log.info("Fetching available parking slots for vehicle type: {}", vechileType);
+
+          int count = 0;
+            
+          for(ParkingLocation  location : parkSpot.keySet()){
+                 
+                Map<VechileType , PriorityQueue<Integer>> map = parkSpot.get(location);
+
+                count+=map.get(vechileType).size();
+          }
+
+          return count;
     }
 }

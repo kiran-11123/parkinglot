@@ -5,11 +5,13 @@ import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Service;
 
+import com.example.parkinglot.dto.GetParkingSlotsResponse;
 import com.example.parkinglot.dto.RequestDto;
 import com.example.parkinglot.dto.ResponseDto;
 import com.example.parkinglot.dto.parkingSpotResponse;
 import com.example.parkinglot.entity.VechileParking;
 import com.example.parkinglot.entity.VechileParkingSpot;
+import com.example.parkinglot.entity.VechileType;
 import com.example.parkinglot.exception.ParkingSpotNotAvailableException;
 import com.example.parkinglot.exception.VechileNotFoundException;
 import com.example.parkinglot.exception.vechileNumberExists;
@@ -114,6 +116,53 @@ LocalDateTime endOfDay = today.plusDays(1).atStartOfDay();
                     return new VechileNotFoundException("Vehicle number not found in the parking lot");
                 });
     }
+
+
+    public ResponseDto releaseParkingSpot(String VechileNumber){
+           
+        VechileParking vechileParking = parkingVechileRepository.findByVechileNumber(VechileNumber)
+                .orElseThrow(() -> {
+                    log.error("Vehicle number {} not found in the parking lot", VechileNumber);
+                    return new VechileNotFoundException("Vehicle number not found in the parking lot");
+                });
+
+        
+                boolean releaseParkingSlot = parkingSpotAllocator.releaseParkingSpot(
+                        vechileParking.getVechileParkingSpot().getLocation(),
+                        vechileParking.getType(),
+                        vechileParking.getVechileParkingSpot().getSpotId()
+                );
+
+                if(!releaseParkingSlot){
+                    log.error("Failed to release parking spot for vehicle number: {}", VechileNumber);
+                    throw new RuntimeException("Failed to release parking spot for vehicle number: " + VechileNumber);
+                }
+
+            vechileParking.setExitTime(LocalDateTime.now());
+            VechileParking updatedVechileParking = parkingVechileRepository.save(vechileParking);
+            return ResponseDto.builder()
+                    .vechileNumber(updatedVechileParking.getVechileNumber())
+                    .entryTime(updatedVechileParking.getEntryTime())
+                    .parkingLocation(updatedVechileParking.getVechileParkingSpot().getLocation())
+                    .spotId(updatedVechileParking.getVechileParkingSpot().getSpotId())
+                    .parkingSpot(updatedVechileParking.getVechileParkingSpot().getParkingSpot())
+                    .vechileType(updatedVechileParking.getType())
+                    .build();
+    }
+    
+
+    public GetParkingSlotsResponse getParkingSlots(VechileType vechileType){
+           
+        log.info("Entered into getParkingSlotsResponse Service");
+          
+        int result = parkingSpotAllocator.getParkingSlots(vechileType);
+
+        return GetParkingSlotsResponse.builder()
+                .slotsAvailable(result)
+                .type(vechileType)
+                .build();
+    }
+
 
 
 }
